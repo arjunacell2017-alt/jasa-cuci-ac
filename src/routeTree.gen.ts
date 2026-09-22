@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as HargaRouteImport } from './routes/harga'
 import { Route as LayananRouteImport } from './routes/layanan'
 import { Route as TentangRouteImport } from './routes/tentang'
@@ -17,6 +18,11 @@ import { Route as TentangRouteImport } from './routes/tentang'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HargaRoute = HargaRouteImport.update({
@@ -37,12 +43,14 @@ const TentangRoute = TentangRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/faq': typeof FaqRoute
   '/harga': typeof HargaRoute
   '/layanan': typeof LayananRoute
   '/tentang': typeof TentangRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/faq': typeof FaqRoute
   '/harga': typeof HargaRoute
   '/layanan': typeof LayananRoute
   '/tentang': typeof TentangRoute
@@ -50,20 +58,22 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/faq': typeof FaqRoute
   '/harga': typeof HargaRoute
   '/layanan': typeof LayananRoute
   '/tentang': typeof TentangRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/harga' | '/layanan' | '/tentang'
+  fullPaths: '/' | '/faq' | '/harga' | '/layanan' | '/tentang'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/harga' | '/layanan' | '/tentang'
-  id: '__root__' | '/' | '/harga' | '/layanan' | '/tentang'
+  to: '/' | '/faq' | '/harga' | '/layanan' | '/tentang'
+  id: '__root__' | '/' | '/faq' | '/harga' | '/layanan' | '/tentang'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  FaqRoute: typeof FaqRoute
   HargaRoute: typeof HargaRoute
   LayananRoute: typeof LayananRoute
   TentangRoute: typeof TentangRoute
@@ -76,6 +86,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/harga': {
@@ -104,6 +121,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  FaqRoute: FaqRoute,
   HargaRoute: HargaRoute,
   LayananRoute: LayananRoute,
   TentangRoute: TentangRoute,
