@@ -28,7 +28,7 @@ export function BookingButton({
   return (
     <Link
       to="/booking"
-      search={service ? { service } : {}}
+      search={{ service }}
       onClick={onClick}
       className={cn(
         "inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",

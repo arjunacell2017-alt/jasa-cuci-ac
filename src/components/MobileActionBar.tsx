@@ -24,6 +24,7 @@ export function MobileActionBar() {
         </a>
         <Link
           to="/booking"
+          search={{ service: undefined }}
           className="flex flex-col items-center gap-1 rounded-xl bg-navy py-1.5 text-[11px] font-semibold text-navy-foreground"
         >
           <CalendarPlus className="size-5" aria-hidden />

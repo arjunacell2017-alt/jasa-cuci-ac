@@ -33,7 +33,7 @@ import { bookingSchema, type BookingValues } from "@/lib/bookingSchema";
 
 export const Route = createFileRoute("/booking")({
   validateSearch: (search: Record<string, unknown>) => ({
-    service: typeof search.service === "string" ? search.service : undefined,
+    service: typeof search["service"] === "string" ? (search["service"] as string) : undefined,
   }),
   head: () => ({
     meta: [
@@ -316,7 +316,10 @@ function BookingPage() {
                     control={control}
                     name="time"
                     render={({ field }) => (
-                      <Select value={field.value} onValueChange={field.onChange}>
+                      <Select
+                        {...(field.value ? { value: field.value } : {})}
+                        onValueChange={field.onChange}
+                      >
                         <SelectTrigger className="!h-12 w-full text-base">
                           <SelectValue placeholder="Pilih jam kunjungan" />
                         </SelectTrigger>

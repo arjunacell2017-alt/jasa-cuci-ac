@@ -40,9 +40,9 @@ export type BookingMessageData = {
   units: number;
   acType: string;
   date: string;
-  time?: string;
+  time?: string | undefined;
   address: string;
-  complaint?: string;
+  complaint?: string | undefined;
 };
 
 export function buildBookingMessage(data: BookingMessageData) {
