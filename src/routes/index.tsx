@@ -98,7 +98,7 @@ function Index() {
               Melayani {site.serviceAreas.join(" • ")}
             </span>
             <h1 className="mt-6 text-3xl leading-tight font-extrabold text-navy-foreground sm:text-4xl lg:text-5xl">
-              Jasa Cuci, Service & Perbaikan AC yang Bisa Anda Percaya
+              Jasa Cuci, Service & Perbaikan AC Profesional
             </h1>
             <p className="mt-5 max-w-xl text-base leading-relaxed text-navy-foreground/75 sm:text-lg">
               Teknisi {site.name} datang ke rumah, kantor, toko, dan tempat usaha Anda. Harga
