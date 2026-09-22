@@ -10,11 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as HargaRouteImport } from './routes/harga'
 import { Route as LayananRouteImport } from './routes/layanan'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HargaRoute = HargaRouteImport.update({
+  id: '/harga',
+  path: '/harga',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LayananRoute = LayananRouteImport.update({
@@ -25,27 +31,31 @@ const LayananRoute = LayananRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/harga': typeof HargaRoute
   '/layanan': typeof LayananRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/harga': typeof HargaRoute
   '/layanan': typeof LayananRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/harga': typeof HargaRoute
   '/layanan': typeof LayananRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/layanan'
+  fullPaths: '/' | '/harga' | '/layanan'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/layanan'
-  id: '__root__' | '/' | '/layanan'
+  to: '/' | '/harga' | '/layanan'
+  id: '__root__' | '/' | '/harga' | '/layanan'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  HargaRoute: typeof HargaRoute
   LayananRoute: typeof LayananRoute
 }
 
@@ -56,6 +66,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/harga': {
+      id: '/harga'
+      path: '/harga'
+      fullPath: '/harga'
+      preLoaderRoute: typeof HargaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/layanan': {
@@ -70,6 +87,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  HargaRoute: HargaRoute,
   LayananRoute: LayananRoute,
 }
 export const routeTree = rootRouteImport
