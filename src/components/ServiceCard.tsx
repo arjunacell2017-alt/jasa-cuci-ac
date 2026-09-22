@@ -20,15 +20,15 @@ export function ServiceCard({ service, detailed = false }: { service: Service; d
         </p>
         <p className="mt-1 text-sm font-medium text-foreground">{service.bestFor}</p>
       </div>
-      <a
-        href={waLink(`Halo ${site.name}, saya ingin pesan layanan ${service.title}.`)}
-        target="_blank"
-        rel="noopener noreferrer"
+      <Link
+        to="/booking"
+        search={{ service: service.slug }}
         className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-brand hover:underline"
       >
         Pesan layanan ini
         <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
-      </a>
+      </Link>
+
     </article>
   );
 }
