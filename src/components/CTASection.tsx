@@ -1,6 +1,6 @@
 import { Phone } from "lucide-react";
-import { bookingMessage, site, telLink } from "@/config/site";
-import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { site, telLink } from "@/config/site";
+import { BookingButton } from "@/components/BookingButton";
 
 export function CTASection({
   title = "Butuh teknisi AC hari ini?",
@@ -17,9 +17,7 @@ export function CTASection({
           {description}
         </p>
         <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <WhatsAppButton size="lg" message={bookingMessage}>
-            Booking Sekarang
-          </WhatsAppButton>
+          <BookingButton size="lg">Booking Sekarang</BookingButton>
           <a
             href={telLink}
             className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-navy-foreground/25 px-6 text-base font-semibold text-navy-foreground transition-colors hover:bg-navy-foreground/10"

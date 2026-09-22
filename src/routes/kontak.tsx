@@ -109,9 +109,9 @@ function KontakPage() {
             <div className="mt-4">
               <ServiceAreaList />
             </div>
-            <WhatsAppButton className="mt-6 w-full" size="lg" message={bookingMessage}>
+            <BookingButton className="mt-6 w-full" size="lg">
               Booking Sekarang
-            </WhatsAppButton>
+            </BookingButton>
           </div>
         </div>
       </section>
