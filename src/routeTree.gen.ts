@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BookingRouteImport } from './routes/booking'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as HargaRouteImport } from './routes/harga'
 import { Route as KontakRouteImport } from './routes/kontak'
@@ -19,6 +20,11 @@ import { Route as TentangRouteImport } from './routes/tentang'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BookingRoute = BookingRouteImport.update({
+  id: '/booking',
+  path: '/booking',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FaqRoute = FaqRouteImport.update({
@@ -49,6 +55,7 @@ const TentangRoute = TentangRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/booking': typeof BookingRoute
   '/faq': typeof FaqRoute
   '/harga': typeof HargaRoute
   '/kontak': typeof KontakRoute
@@ -57,6 +64,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/booking': typeof BookingRoute
   '/faq': typeof FaqRoute
   '/harga': typeof HargaRoute
   '/kontak': typeof KontakRoute
@@ -66,6 +74,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/booking': typeof BookingRoute
   '/faq': typeof FaqRoute
   '/harga': typeof HargaRoute
   '/kontak': typeof KontakRoute
@@ -74,14 +83,24 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/faq' | '/harga' | '/kontak' | '/layanan' | '/tentang'
+  fullPaths:
+    '/' | '/booking' | '/faq' | '/harga' | '/kontak' | '/layanan' | '/tentang'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/faq' | '/harga' | '/kontak' | '/layanan' | '/tentang'
-  id: '__root__' | '/' | '/faq' | '/harga' | '/kontak' | '/layanan' | '/tentang'
+  to: '/' | '/booking' | '/faq' | '/harga' | '/kontak' | '/layanan' | '/tentang'
+  id:
+    | '__root__'
+    | '/'
+    | '/booking'
+    | '/faq'
+    | '/harga'
+    | '/kontak'
+    | '/layanan'
+    | '/tentang'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BookingRoute: typeof BookingRoute
   FaqRoute: typeof FaqRoute
   HargaRoute: typeof HargaRoute
   KontakRoute: typeof KontakRoute
@@ -96,6 +115,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/booking': {
+      id: '/booking'
+      path: '/booking'
+      fullPath: '/booking'
+      preLoaderRoute: typeof BookingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/faq': {
@@ -138,6 +164,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BookingRoute: BookingRoute,
   FaqRoute: FaqRoute,
   HargaRoute: HargaRoute,
   KontakRoute: KontakRoute,
