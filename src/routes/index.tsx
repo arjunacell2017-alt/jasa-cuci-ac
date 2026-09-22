@@ -8,11 +8,12 @@ import {
   ArrowRight,
   Phone,
 } from "lucide-react";
-import { bookingMessage, site, telLink } from "@/config/site";
+import { site, telLink } from "@/config/site";
 import { services } from "@/data/services";
 import { ServiceCard } from "@/components/ServiceCard";
 import { SectionHeading } from "@/components/SectionHeading";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { BookingButton } from "@/components/BookingButton";
 import { CTASection } from "@/components/CTASection";
 import { ServiceAreaList } from "@/components/ServiceAreaList";
 

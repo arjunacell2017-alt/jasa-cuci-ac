@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Clock, MapPin, MessageCircle, Phone } from "lucide-react";
-import { bookingMessage, site, telLink } from "@/config/site";
+import { site, telLink } from "@/config/site";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { BookingButton } from "@/components/BookingButton";
 import { PageHero } from "@/components/PageHero";
 import { ServiceAreaList } from "@/components/ServiceAreaList";
 import { CTASection } from "@/components/CTASection";
