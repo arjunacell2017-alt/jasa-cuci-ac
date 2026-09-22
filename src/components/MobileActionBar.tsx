@@ -1,5 +1,6 @@
 import { CalendarPlus, MessageCircle, Phone } from "lucide-react";
-import { bookingMessage, telLink, waLink } from "@/config/site";
+import { Link } from "@tanstack/react-router";
+import { telLink, waLink } from "@/config/site";
 
 export function MobileActionBar() {
   return (
@@ -21,15 +22,14 @@ export function MobileActionBar() {
           <Phone className="size-5" aria-hidden />
           Telepon
         </a>
-        <a
-          href={waLink(bookingMessage)}
-          target="_blank"
-          rel="noopener noreferrer"
+        <Link
+          to="/booking"
+          search={{ service: undefined }}
           className="flex flex-col items-center gap-1 rounded-xl bg-navy py-1.5 text-[11px] font-semibold text-navy-foreground"
         >
           <CalendarPlus className="size-5" aria-hidden />
           Booking
-        </a>
+        </Link>
       </div>
     </div>
   );

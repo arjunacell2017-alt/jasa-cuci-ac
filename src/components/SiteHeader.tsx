@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Menu, Phone, Snowflake, X } from "lucide-react";
-import { navItems, site, bookingMessage, telLink } from "@/config/site";
-import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { navItems, site, telLink } from "@/config/site";
+import { BookingButton } from "@/components/BookingButton";
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
@@ -44,7 +44,7 @@ export function SiteHeader() {
             <Phone className="size-4" aria-hidden />
             {site.phone.display}
           </a>
-          <WhatsAppButton message={bookingMessage}>Booking Sekarang</WhatsAppButton>
+          <BookingButton>Booking Sekarang</BookingButton>
         </div>
 
         <button
@@ -73,9 +73,9 @@ export function SiteHeader() {
                 {item.label}
               </Link>
             ))}
-            <WhatsAppButton className="mt-3 w-full" size="lg" message={bookingMessage}>
+            <BookingButton className="mt-3 w-full" size="lg" onClick={() => setOpen(false)}>
               Booking Sekarang
-            </WhatsAppButton>
+            </BookingButton>
           </nav>
         </div>
       ) : null}

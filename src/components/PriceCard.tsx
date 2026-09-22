@@ -1,7 +1,8 @@
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { PriceGroup } from "@/data/pricing";
-import { site, waLink } from "@/config/site";
+import { site } from "@/config/site";
+import { BookingButton } from "@/components/BookingButton";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 export function PriceTable({ group }: { group: PriceGroup }) {
@@ -76,15 +77,16 @@ export function PackageCard({
           </li>
         ))}
       </ul>
+      <BookingButton className="mt-6 w-full" service="maintenance-rumah">
+        Booking paket ini
+      </BookingButton>
       <WhatsAppButton
-        className="mt-6 w-full"
+        className="mt-2 w-full"
+        size="sm"
         message={`Halo ${site.name}, saya tertarik dengan ${name} untuk perawatan AC berkala.`}
       >
         Tanya paket ini
       </WhatsAppButton>
-      <a href={waLink()} className="sr-only">
-        Hubungi kami
-      </a>
     </div>
   );
 }

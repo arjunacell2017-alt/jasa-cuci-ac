@@ -8,11 +8,12 @@ import {
   ArrowRight,
   Phone,
 } from "lucide-react";
-import { bookingMessage, site, telLink } from "@/config/site";
+import { site, telLink } from "@/config/site";
 import { services } from "@/data/services";
 import { ServiceCard } from "@/components/ServiceCard";
 import { SectionHeading } from "@/components/SectionHeading";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { BookingButton } from "@/components/BookingButton";
 import { CTASection } from "@/components/CTASection";
 import { ServiceAreaList } from "@/components/ServiceAreaList";
 
@@ -105,9 +106,7 @@ function Index() {
               transparan, pekerjaan rapi, dan bergaransi.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <WhatsAppButton size="lg" message={bookingMessage}>
-                Booking Sekarang
-              </WhatsAppButton>
+              <BookingButton size="lg">Booking Sekarang</BookingButton>
               <a
                 href={telLink}
                 className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-navy-foreground/25 px-6 text-base font-semibold text-navy-foreground transition-colors hover:bg-navy-foreground/10"

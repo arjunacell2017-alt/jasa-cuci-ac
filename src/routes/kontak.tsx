@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Clock, MapPin, MessageCircle, Phone } from "lucide-react";
-import { bookingMessage, site, telLink } from "@/config/site";
+import { site, telLink } from "@/config/site";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { BookingButton } from "@/components/BookingButton";
 import { PageHero } from "@/components/PageHero";
 import { ServiceAreaList } from "@/components/ServiceAreaList";
 import { CTASection } from "@/components/CTASection";
@@ -109,9 +110,9 @@ function KontakPage() {
             <div className="mt-4">
               <ServiceAreaList />
             </div>
-            <WhatsAppButton className="mt-6 w-full" size="lg" message={bookingMessage}>
+            <BookingButton className="mt-6 w-full" size="lg">
               Booking Sekarang
-            </WhatsAppButton>
+            </BookingButton>
           </div>
         </div>
       </section>
