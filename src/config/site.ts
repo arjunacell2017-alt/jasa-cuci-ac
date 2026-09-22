@@ -33,6 +33,39 @@ export const bookingMessage = `Halo ${site.name}, saya mau booking jasa AC.%0ANa
   .split("%0A")
   .join("\n");
 
+export type BookingMessageData = {
+  name: string;
+  phone: string;
+  service: string;
+  units: number;
+  acType: string;
+  date: string;
+  time?: string;
+  address: string;
+  complaint?: string;
+};
+
+export function buildBookingMessage(data: BookingMessageData) {
+  const lines = [
+    `Halo ${site.name}, saya ingin melakukan booking jasa AC.`,
+    "",
+    "DATA BOOKING",
+    "",
+    `Nama: ${data.name}`,
+    `No. WhatsApp: ${data.phone}`,
+    `Layanan: ${data.service}`,
+    `Jumlah Unit: ${data.units}`,
+    `Jenis AC: ${data.acType}`,
+    `Tanggal: ${data.date}`,
+  ];
+  if (data.time) lines.push(`Waktu: ${data.time}`);
+  lines.push("", "Alamat:", data.address);
+  if (data.complaint?.trim()) lines.push("", "Keluhan:", data.complaint.trim());
+  lines.push("", "Mohon informasi dan konfirmasi jadwalnya.", "", "Terima kasih.");
+  return lines.join("\n");
+}
+
+
 export const telLink = `tel:+62${site.phone.raw.slice(1)}`;
 
 export const navItems = [
