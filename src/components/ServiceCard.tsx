@@ -1,6 +1,7 @@
 import { ArrowRight } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import type { Service } from "@/data/services";
-import { waLink, site } from "@/config/site";
+
 
 export function ServiceCard({ service, detailed = false }: { service: Service; detailed?: boolean }) {
   const Icon = service.icon;
