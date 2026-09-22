@@ -18,7 +18,7 @@ export const site = {
     full: "Beji RT 01 RW 01 Bojongsari, Purbalingga, Jawa Tengah 53362",
   },
   hours: [
-    { day: "Senin - Sabtu", time: "07.00 - 20.00 WIB" },
+    { day: "Senin - Sabtu", time: "08.00 - 20.00 WIB" },
     { day: "Minggu & hari libur", time: "08.00 - 17.00 WIB (panggilan darurat)" },
   ],
   serviceAreas: ["Purbalingga", "Banyumas", "Cilacap", "Banjarnegara"],

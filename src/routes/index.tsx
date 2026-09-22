@@ -165,8 +165,8 @@ function Index() {
         <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <SectionHeading
             eyebrow="Layanan kami"
-            title="Semua kebutuhan AC ditangani satu tim"
-            description="Dari cuci rutin sampai bongkar pasang unit, semuanya dikerjakan teknisi yang sama sehingga kondisi AC Anda selalu terpantau."
+            title="Semua kebutuhan AC ditangani tim profesional"
+            description="Dari cuci rutin sampai bongkar pasang unit, semuanya dikerjakan teknisi profesional sehingga kondisi AC Anda selalu terpantau."
           />
           <Link
             to="/layanan"
