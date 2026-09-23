@@ -14,16 +14,254 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      maintenance_packages: {
+        Row: {
+          created_at: string
+          description: string
+          display_order: number
+          features: string[]
+          id: string
+          is_active: boolean
+          is_highlighted: boolean
+          name: string
+          period: string
+          price: number | null
+          price_label: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          display_order?: number
+          features?: string[]
+          id?: string
+          is_active?: boolean
+          is_highlighted?: boolean
+          name: string
+          period?: string
+          price?: number | null
+          price_label?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          display_order?: number
+          features?: string[]
+          id?: string
+          is_active?: boolean
+          is_highlighted?: boolean
+          name?: string
+          period?: string
+          price?: number | null
+          price_label?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      period_prices: {
+        Row: {
+          created_at: string
+          id: string
+          note: string
+          period_id: string
+          price: number
+          price_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note?: string
+          period_id: string
+          price: number
+          price_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note?: string
+          period_id?: string
+          price?: number
+          price_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "period_prices_period_id_fkey"
+            columns: ["period_id"]
+            isOneToOne: false
+            referencedRelation: "price_periods"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "period_prices_price_id_fkey"
+            columns: ["price_id"]
+            isOneToOne: false
+            referencedRelation: "prices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      price_periods: {
+        Row: {
+          created_at: string
+          description: string
+          ends_on: string
+          id: string
+          is_active: boolean
+          name: string
+          priority: number
+          starts_on: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          ends_on: string
+          id?: string
+          is_active?: boolean
+          name: string
+          priority?: number
+          starts_on: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          ends_on?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          priority?: number
+          starts_on?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      prices: {
+        Row: {
+          created_at: string
+          description: string
+          display_order: number
+          id: string
+          is_active: boolean
+          is_popular: boolean
+          name: string
+          price: number | null
+          price_unit: string
+          service_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          is_popular?: boolean
+          name: string
+          price?: number | null
+          price_unit?: string
+          service_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          is_popular?: boolean
+          name?: string
+          price?: number | null
+          price_unit?: string
+          service_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prices_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      services: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          display_order: number
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          name: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "technician" | "customer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +388,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "technician", "customer"],
+    },
   },
 } as const
