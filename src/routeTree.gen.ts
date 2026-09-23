@@ -16,6 +16,7 @@ import { Route as HargaRouteImport } from './routes/harga'
 import { Route as KontakRouteImport } from './routes/kontak'
 import { Route as LayananRouteImport } from './routes/layanan'
 import { Route as TentangRouteImport } from './routes/tentang'
+import { Route as AdminLoginRouteImport } from './routes/admin.login'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -52,6 +53,11 @@ const TentangRoute = TentangRouteImport.update({
   path: '/tentang',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin/login',
+  path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -61,6 +67,7 @@ export interface FileRoutesByFullPath {
   '/kontak': typeof KontakRoute
   '/layanan': typeof LayananRoute
   '/tentang': typeof TentangRoute
+  '/admin/login': typeof AdminLoginRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -70,6 +77,7 @@ export interface FileRoutesByTo {
   '/kontak': typeof KontakRoute
   '/layanan': typeof LayananRoute
   '/tentang': typeof TentangRoute
+  '/admin/login': typeof AdminLoginRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -80,13 +88,29 @@ export interface FileRoutesById {
   '/kontak': typeof KontakRoute
   '/layanan': typeof LayananRoute
   '/tentang': typeof TentangRoute
+  '/admin/login': typeof AdminLoginRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/booking' | '/faq' | '/harga' | '/kontak' | '/layanan' | '/tentang'
+    | '/'
+    | '/booking'
+    | '/faq'
+    | '/harga'
+    | '/kontak'
+    | '/layanan'
+    | '/tentang'
+    | '/admin/login'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/booking' | '/faq' | '/harga' | '/kontak' | '/layanan' | '/tentang'
+  to:
+    | '/'
+    | '/booking'
+    | '/faq'
+    | '/harga'
+    | '/kontak'
+    | '/layanan'
+    | '/tentang'
+    | '/admin/login'
   id:
     | '__root__'
     | '/'
@@ -96,6 +120,7 @@ export interface FileRouteTypes {
     | '/kontak'
     | '/layanan'
     | '/tentang'
+    | '/admin/login'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -106,6 +131,7 @@ export interface RootRouteChildren {
   KontakRoute: typeof KontakRoute
   LayananRoute: typeof LayananRoute
   TentangRoute: typeof TentangRoute
+  AdminLoginRoute: typeof AdminLoginRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -159,6 +185,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TentangRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -170,6 +203,7 @@ const rootRouteChildren: RootRouteChildren = {
   KontakRoute: KontakRoute,
   LayananRoute: LayananRoute,
   TentangRoute: TentangRoute,
+  AdminLoginRoute: AdminLoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
