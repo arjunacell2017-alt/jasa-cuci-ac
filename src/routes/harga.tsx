@@ -1,10 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { Info } from "lucide-react";
-import { priceGroups, maintenancePackages } from "@/data/pricing";
 import { PriceTable, PackageCard } from "@/components/PriceCard";
 import { SectionHeading } from "@/components/SectionHeading";
 import { CTASection } from "@/components/CTASection";
 import { PageHero } from "@/components/PageHero";
+import { getPublicPricing } from "@/lib/pricing.functions";
+
+export const pricingQueryOptions = queryOptions({
+  queryKey: ["pricing", "public"],
+  queryFn: () => getPublicPricing(),
+});
 
 export const Route = createFileRoute("/harga")({
   head: () => ({
@@ -22,10 +28,21 @@ export const Route = createFileRoute("/harga")({
       },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(pricingQueryOptions),
   component: HargaPage,
+  errorComponent: () => (
+    <section className="container-page py-20 text-center">
+      <h1 className="text-xl font-semibold text-foreground">Daftar harga gagal dimuat</h1>
+      <p className="mt-2 text-sm text-muted-foreground">
+        Silakan muat ulang halaman atau hubungi kami lewat WhatsApp.
+      </p>
+    </section>
+  ),
 });
 
 function HargaPage() {
+  const { data } = useSuspenseQuery(pricingQueryOptions);
+
   return (
     <>
       <PageHero
@@ -45,8 +62,8 @@ function HargaPage() {
         </div>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-2">
-          {priceGroups.map((g) => (
-            <PriceTable key={g.title} group={g} />
+          {data.services.map((g) => (
+            <PriceTable key={g.id} group={g} />
           ))}
         </div>
       </section>
@@ -60,8 +77,8 @@ function HargaPage() {
             align="center"
           />
           <div className="mt-10 grid gap-5 lg:grid-cols-3">
-            {maintenancePackages.map((p) => (
-              <PackageCard key={p.name} {...p} />
+            {data.packages.map((p) => (
+              <PackageCard key={p.id} pkg={p} />
             ))}
           </div>
         </div>
