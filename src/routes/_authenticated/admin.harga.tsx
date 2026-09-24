@@ -107,7 +107,17 @@ function AdminHargaPage() {
 
   const serviceMutation = useMutation({
     mutationFn: (draft: ServiceDraft) =>
-      saveServiceFn({ data: { ...(draft.id ? { id: draft.id } : {}), ...draft, id: undefined } as never }),
+      saveServiceFn({
+        data: {
+          ...(draft.id ? { id: draft.id } : {}),
+          name: draft.name,
+          slug: draft.slug,
+          description: draft.description,
+          category: draft.category,
+          is_active: draft.is_active,
+          display_order: draft.display_order,
+        },
+      }),
     onSuccess: () => {
       toast.success("Layanan tersimpan.");
       setServiceDraft(null);
