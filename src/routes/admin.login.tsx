@@ -69,9 +69,13 @@ function AdminLoginPage() {
         <span className="inline-flex size-10 items-center justify-center rounded-xl bg-navy text-navy-foreground">
           <Snowflake className="size-5" aria-hidden />
         </span>
-        <h1 className="mt-4 text-xl font-bold text-foreground">Masuk Admin</h1>
+        <h1 className="mt-4 text-xl font-bold text-foreground">
+          {setupMode ? "Buat Akun Admin" : "Masuk Admin"}
+        </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Halaman ini khusus pengelola ARJUNA COOL.ID.
+          {setupMode
+            ? "Belum ada akun pengelola. Buat akun admin pertama Anda di sini."
+            : "Halaman ini khusus pengelola ARJUNA COOL.ID."}
         </p>
 
         <form onSubmit={onSubmit} className="mt-6 space-y-4">
@@ -101,7 +105,7 @@ function AdminLoginPage() {
           </div>
           {error ? <p className="text-sm font-medium text-destructive">{error}</p> : null}
           <Button type="submit" className="h-12 w-full" disabled={loading}>
-            {loading ? "Memproses..." : "Masuk"}
+            {loading ? "Memproses..." : setupMode ? "Buat akun & masuk" : "Masuk"}
           </Button>
         </form>
       </div>
