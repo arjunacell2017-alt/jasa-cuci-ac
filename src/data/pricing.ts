@@ -1,3 +1,8 @@
+/**
+ * @deprecated Hanya referensi data awal (seed) — angka di sini SUDAH DIPINDAHKAN ke database
+ * dan TIDAK lagi dipakai komponen mana pun. Harga asli diubah lewat dashboard admin
+ * (/admin/harga), bukan di file ini. Angka di bawah masih harga contoh (dummy).
+ */
 export type PriceItem = {
   name: string;
   detail: string;
