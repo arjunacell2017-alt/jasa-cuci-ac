@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Snowflake } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { createFirstAdmin, hasAdminAccount } from "@/lib/adminSetup.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,6 +25,15 @@ export const Route = createFileRoute("/admin/login")({
 
 function AdminLoginPage() {
   const navigate = useNavigate();
+  const checkAdmin = useServerFn(hasAdminAccount);
+  const createAdmin = useServerFn(createFirstAdmin);
+  const { data: adminState } = useQuery({
+    queryKey: ["admin", "has-admin"],
+    queryFn: () => checkAdmin(),
+    retry: false,
+  });
+  const setupMode = adminState?.hasAdmin === false;
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -31,6 +43,17 @@ function AdminLoginPage() {
     e.preventDefault();
     setError(null);
     setLoading(true);
+
+    if (setupMode) {
+      try {
+        await createAdmin({ data: { email, password } });
+      } catch {
+        setLoading(false);
+        setError("Gagal membuat akun admin. Kata sandi minimal 8 karakter.");
+        return;
+      }
+    }
+
     const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (signInError) {
@@ -46,9 +69,13 @@ function AdminLoginPage() {
         <span className="inline-flex size-10 items-center justify-center rounded-xl bg-navy text-navy-foreground">
           <Snowflake className="size-5" aria-hidden />
         </span>
-        <h1 className="mt-4 text-xl font-bold text-foreground">Masuk Admin</h1>
+        <h1 className="mt-4 text-xl font-bold text-foreground">
+          {setupMode ? "Buat Akun Admin" : "Masuk Admin"}
+        </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Halaman ini khusus pengelola ARJUNA COOL.ID.
+          {setupMode
+            ? "Belum ada akun pengelola. Buat akun admin pertama Anda di sini."
+            : "Halaman ini khusus pengelola ARJUNA COOL.ID."}
         </p>
 
         <form onSubmit={onSubmit} className="mt-6 space-y-4">
@@ -78,7 +105,7 @@ function AdminLoginPage() {
           </div>
           {error ? <p className="text-sm font-medium text-destructive">{error}</p> : null}
           <Button type="submit" className="h-12 w-full" disabled={loading}>
-            {loading ? "Memproses..." : "Masuk"}
+            {loading ? "Memproses..." : setupMode ? "Buat akun & masuk" : "Masuk"}
           </Button>
         </form>
       </div>
