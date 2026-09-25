@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Snowflake } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { createFirstAdmin, hasAdminAccount } from "@/lib/adminSetup.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,6 +25,15 @@ export const Route = createFileRoute("/admin/login")({
 
 function AdminLoginPage() {
   const navigate = useNavigate();
+  const checkAdmin = useServerFn(hasAdminAccount);
+  const createAdmin = useServerFn(createFirstAdmin);
+  const { data: adminState } = useQuery({
+    queryKey: ["admin", "has-admin"],
+    queryFn: () => checkAdmin(),
+    retry: false,
+  });
+  const setupMode = adminState?.hasAdmin === false;
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -31,6 +43,17 @@ function AdminLoginPage() {
     e.preventDefault();
     setError(null);
     setLoading(true);
+
+    if (setupMode) {
+      try {
+        await createAdmin({ data: { email, password } });
+      } catch {
+        setLoading(false);
+        setError("Gagal membuat akun admin. Kata sandi minimal 8 karakter.");
+        return;
+      }
+    }
+
     const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (signInError) {
