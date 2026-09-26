@@ -14,6 +14,81 @@ export type Database = {
   }
   public: {
     Tables: {
+      bookings: {
+        Row: {
+          ac_type: string
+          alamat: string
+          assigned_at: string | null
+          created_at: string
+          id: string
+          keluhan: string
+          nama: string
+          service_label: string
+          service_type_id: string | null
+          status: Database["public"]["Enums"]["booking_status"]
+          tanggal: string | null
+          technician_id: string | null
+          technician_notes: string
+          unit_count: number
+          updated_at: string
+          waktu: string
+          whatsapp: string
+        }
+        Insert: {
+          ac_type?: string
+          alamat: string
+          assigned_at?: string | null
+          created_at?: string
+          id?: string
+          keluhan?: string
+          nama: string
+          service_label: string
+          service_type_id?: string | null
+          status?: Database["public"]["Enums"]["booking_status"]
+          tanggal?: string | null
+          technician_id?: string | null
+          technician_notes?: string
+          unit_count?: number
+          updated_at?: string
+          waktu?: string
+          whatsapp: string
+        }
+        Update: {
+          ac_type?: string
+          alamat?: string
+          assigned_at?: string | null
+          created_at?: string
+          id?: string
+          keluhan?: string
+          nama?: string
+          service_label?: string
+          service_type_id?: string | null
+          status?: Database["public"]["Enums"]["booking_status"]
+          tanggal?: string | null
+          technician_id?: string | null
+          technician_notes?: string
+          unit_count?: number
+          updated_at?: string
+          waktu?: string
+          whatsapp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_service_type_id_fkey"
+            columns: ["service_type_id"]
+            isOneToOne: false
+            referencedRelation: "service_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_technician_id_fkey"
+            columns: ["technician_id"]
+            isOneToOne: false
+            referencedRelation: "technicians"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       maintenance_packages: {
         Row: {
           created_at: string
@@ -190,6 +265,36 @@ export type Database = {
           },
         ]
       }
+      service_types: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          name: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       services: {
         Row: {
           category: string
@@ -222,6 +327,93 @@ export type Database = {
           is_active?: boolean
           name?: string
           slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      technician_services: {
+        Row: {
+          service_type_id: string
+          technician_id: string
+        }
+        Insert: {
+          service_type_id: string
+          technician_id: string
+        }
+        Update: {
+          service_type_id?: string
+          technician_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "technician_services_service_type_id_fkey"
+            columns: ["service_type_id"]
+            isOneToOne: false
+            referencedRelation: "service_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "technician_services_technician_id_fkey"
+            columns: ["technician_id"]
+            isOneToOne: false
+            referencedRelation: "technicians"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      technicians: {
+        Row: {
+          alamat: string
+          area_layanan: string
+          catatan_admin: string
+          created_at: string
+          email: string
+          foto_path: string | null
+          id: string
+          kabupaten: string
+          kecamatan: string
+          nama_teknisi: string
+          nama_usaha: string
+          nomor_telepon: string
+          nomor_whatsapp: string
+          radius_layanan_km: number | null
+          status: Database["public"]["Enums"]["technician_status"]
+          updated_at: string
+        }
+        Insert: {
+          alamat?: string
+          area_layanan?: string
+          catatan_admin?: string
+          created_at?: string
+          email?: string
+          foto_path?: string | null
+          id?: string
+          kabupaten: string
+          kecamatan?: string
+          nama_teknisi: string
+          nama_usaha?: string
+          nomor_telepon?: string
+          nomor_whatsapp: string
+          radius_layanan_km?: number | null
+          status?: Database["public"]["Enums"]["technician_status"]
+          updated_at?: string
+        }
+        Update: {
+          alamat?: string
+          area_layanan?: string
+          catatan_admin?: string
+          created_at?: string
+          email?: string
+          foto_path?: string | null
+          id?: string
+          kabupaten?: string
+          kecamatan?: string
+          nama_teknisi?: string
+          nama_usaha?: string
+          nomor_telepon?: string
+          nomor_whatsapp?: string
+          radius_layanan_km?: number | null
+          status?: Database["public"]["Enums"]["technician_status"]
           updated_at?: string
         }
         Relationships: []
@@ -262,6 +454,15 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "technician" | "customer"
+      booking_status:
+        | "menunggu_teknisi"
+        | "teknisi_dihubungi"
+        | "teknisi_menerima"
+        | "dijadwalkan"
+        | "dalam_pengerjaan"
+        | "selesai"
+        | "dibatalkan"
+      technician_status: "aktif" | "sibuk" | "tidak_aktif"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -390,6 +591,16 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "technician", "customer"],
+      booking_status: [
+        "menunggu_teknisi",
+        "teknisi_dihubungi",
+        "teknisi_menerima",
+        "dijadwalkan",
+        "dalam_pengerjaan",
+        "selesai",
+        "dibatalkan",
+      ],
+      technician_status: ["aktif", "sibuk", "tidak_aktif"],
     },
   },
 } as const
