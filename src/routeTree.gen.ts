@@ -20,8 +20,11 @@ import { Route as TentangRouteImport } from './routes/tentang'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedAdminBookingRouteImport } from './routes/_authenticated/admin.booking'
 import { Route as AuthenticatedAdminHargaRouteImport } from './routes/_authenticated/admin.harga'
 import { Route as AuthenticatedAdminPaketRouteImport } from './routes/_authenticated/admin.paket'
+import { Route as AuthenticatedAdminTeknisiRouteImport } from './routes/_authenticated/admin.teknisi'
+import { Route as AuthenticatedAdminBookingIdRouteImport } from './routes/_authenticated/admin.booking.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -77,6 +80,12 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminBookingRoute =
+  AuthenticatedAdminBookingRouteImport.update({
+    id: '/booking',
+    path: '/booking',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminHargaRoute = AuthenticatedAdminHargaRouteImport.update({
   id: '/harga',
   path: '/harga',
@@ -87,6 +96,18 @@ const AuthenticatedAdminPaketRoute = AuthenticatedAdminPaketRouteImport.update({
   path: '/paket',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminTeknisiRoute =
+  AuthenticatedAdminTeknisiRouteImport.update({
+    id: '/teknisi',
+    path: '/teknisi',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminBookingIdRoute =
+  AuthenticatedAdminBookingIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedAdminBookingRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -98,9 +119,12 @@ export interface FileRoutesByFullPath {
   '/tentang': typeof TentangRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
+  '/admin/booking': typeof AuthenticatedAdminBookingRouteWithChildren
   '/admin/harga': typeof AuthenticatedAdminHargaRoute
   '/admin/paket': typeof AuthenticatedAdminPaketRoute
+  '/admin/teknisi': typeof AuthenticatedAdminTeknisiRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/admin/booking/$id': typeof AuthenticatedAdminBookingIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -111,9 +135,12 @@ export interface FileRoutesByTo {
   '/layanan': typeof LayananRoute
   '/tentang': typeof TentangRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/booking': typeof AuthenticatedAdminBookingRouteWithChildren
   '/admin/harga': typeof AuthenticatedAdminHargaRoute
   '/admin/paket': typeof AuthenticatedAdminPaketRoute
+  '/admin/teknisi': typeof AuthenticatedAdminTeknisiRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/admin/booking/$id': typeof AuthenticatedAdminBookingIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -127,9 +154,12 @@ export interface FileRoutesById {
   '/tentang': typeof TentangRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
+  '/_authenticated/admin/booking': typeof AuthenticatedAdminBookingRouteWithChildren
   '/_authenticated/admin/harga': typeof AuthenticatedAdminHargaRoute
   '/_authenticated/admin/paket': typeof AuthenticatedAdminPaketRoute
+  '/_authenticated/admin/teknisi': typeof AuthenticatedAdminTeknisiRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/admin/booking/$id': typeof AuthenticatedAdminBookingIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -143,9 +173,12 @@ export interface FileRouteTypes {
     | '/tentang'
     | '/admin'
     | '/admin/login'
+    | '/admin/booking'
     | '/admin/harga'
     | '/admin/paket'
+    | '/admin/teknisi'
     | '/admin/'
+    | '/admin/booking/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -156,9 +189,12 @@ export interface FileRouteTypes {
     | '/layanan'
     | '/tentang'
     | '/admin/login'
+    | '/admin/booking'
     | '/admin/harga'
     | '/admin/paket'
+    | '/admin/teknisi'
     | '/admin'
+    | '/admin/booking/$id'
   id:
     | '__root__'
     | '/'
@@ -171,9 +207,12 @@ export interface FileRouteTypes {
     | '/tentang'
     | '/_authenticated/admin'
     | '/admin/login'
+    | '/_authenticated/admin/booking'
     | '/_authenticated/admin/harga'
     | '/_authenticated/admin/paket'
+    | '/_authenticated/admin/teknisi'
     | '/_authenticated/admin/'
+    | '/_authenticated/admin/booking/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -267,6 +306,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/booking': {
+      id: '/_authenticated/admin/booking'
+      path: '/booking'
+      fullPath: '/admin/booking'
+      preLoaderRoute: typeof AuthenticatedAdminBookingRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/harga': {
       id: '/_authenticated/admin/harga'
       path: '/harga'
@@ -281,18 +327,50 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminPaketRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/teknisi': {
+      id: '/_authenticated/admin/teknisi'
+      path: '/teknisi'
+      fullPath: '/admin/teknisi'
+      preLoaderRoute: typeof AuthenticatedAdminTeknisiRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/booking/$id': {
+      id: '/_authenticated/admin/booking/$id'
+      path: '/$id'
+      fullPath: '/admin/booking/$id'
+      preLoaderRoute: typeof AuthenticatedAdminBookingIdRouteImport
+      parentRoute: typeof AuthenticatedAdminBookingRoute
+    }
   }
 }
 
+interface AuthenticatedAdminBookingRouteChildren {
+  AuthenticatedAdminBookingIdRoute: typeof AuthenticatedAdminBookingIdRoute
+}
+
+const AuthenticatedAdminBookingRouteChildren: AuthenticatedAdminBookingRouteChildren =
+  {
+    AuthenticatedAdminBookingIdRoute: AuthenticatedAdminBookingIdRoute,
+  }
+
+const AuthenticatedAdminBookingRouteWithChildren =
+  AuthenticatedAdminBookingRoute._addFileChildren(
+    AuthenticatedAdminBookingRouteChildren,
+  )
+
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminBookingRoute: typeof AuthenticatedAdminBookingRouteWithChildren
   AuthenticatedAdminHargaRoute: typeof AuthenticatedAdminHargaRoute
   AuthenticatedAdminPaketRoute: typeof AuthenticatedAdminPaketRoute
+  AuthenticatedAdminTeknisiRoute: typeof AuthenticatedAdminTeknisiRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminBookingRoute: AuthenticatedAdminBookingRouteWithChildren,
   AuthenticatedAdminHargaRoute: AuthenticatedAdminHargaRoute,
   AuthenticatedAdminPaketRoute: AuthenticatedAdminPaketRoute,
+  AuthenticatedAdminTeknisiRoute: AuthenticatedAdminTeknisiRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
