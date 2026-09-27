@@ -22,6 +22,7 @@ import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminHargaRouteImport } from './routes/_authenticated/admin.harga'
 import { Route as AuthenticatedAdminPaketRouteImport } from './routes/_authenticated/admin.paket'
+import { Route as AuthenticatedAdminTeknisiRouteImport } from './routes/_authenticated/admin.teknisi'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -87,6 +88,12 @@ const AuthenticatedAdminPaketRoute = AuthenticatedAdminPaketRouteImport.update({
   path: '/paket',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminTeknisiRoute =
+  AuthenticatedAdminTeknisiRouteImport.update({
+    id: '/teknisi',
+    path: '/teknisi',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -100,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/admin/login': typeof AdminLoginRoute
   '/admin/harga': typeof AuthenticatedAdminHargaRoute
   '/admin/paket': typeof AuthenticatedAdminPaketRoute
+  '/admin/teknisi': typeof AuthenticatedAdminTeknisiRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -113,6 +121,7 @@ export interface FileRoutesByTo {
   '/admin/login': typeof AdminLoginRoute
   '/admin/harga': typeof AuthenticatedAdminHargaRoute
   '/admin/paket': typeof AuthenticatedAdminPaketRoute
+  '/admin/teknisi': typeof AuthenticatedAdminTeknisiRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesById {
@@ -129,6 +138,7 @@ export interface FileRoutesById {
   '/admin/login': typeof AdminLoginRoute
   '/_authenticated/admin/harga': typeof AuthenticatedAdminHargaRoute
   '/_authenticated/admin/paket': typeof AuthenticatedAdminPaketRoute
+  '/_authenticated/admin/teknisi': typeof AuthenticatedAdminTeknisiRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -145,6 +155,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/admin/harga'
     | '/admin/paket'
+    | '/admin/teknisi'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -158,6 +169,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/admin/harga'
     | '/admin/paket'
+    | '/admin/teknisi'
     | '/admin'
   id:
     | '__root__'
@@ -173,6 +185,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/_authenticated/admin/harga'
     | '/_authenticated/admin/paket'
+    | '/_authenticated/admin/teknisi'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -281,18 +294,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminPaketRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/teknisi': {
+      id: '/_authenticated/admin/teknisi'
+      path: '/teknisi'
+      fullPath: '/admin/teknisi'
+      preLoaderRoute: typeof AuthenticatedAdminTeknisiRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminHargaRoute: typeof AuthenticatedAdminHargaRoute
   AuthenticatedAdminPaketRoute: typeof AuthenticatedAdminPaketRoute
+  AuthenticatedAdminTeknisiRoute: typeof AuthenticatedAdminTeknisiRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminHargaRoute: AuthenticatedAdminHargaRoute,
   AuthenticatedAdminPaketRoute: AuthenticatedAdminPaketRoute,
+  AuthenticatedAdminTeknisiRoute: AuthenticatedAdminTeknisiRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 

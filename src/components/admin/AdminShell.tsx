@@ -9,6 +9,8 @@ const adminNav = [
   { to: "/admin", label: "Ringkasan", exact: true },
   { to: "/admin/harga", label: "Daftar Harga", exact: false },
   { to: "/admin/paket", label: "Paket Perawatan", exact: false },
+  { to: "/admin/booking", label: "Booking", exact: false },
+  { to: "/admin/teknisi", label: "Teknisi Mitra", exact: false },
 ] as const;
 
 export function AdminShell({

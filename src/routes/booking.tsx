@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { createBooking } from "@/lib/bookings.functions";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -91,6 +93,8 @@ function BookingPage() {
   const { service } = Route.useSearch();
   const [step, setStep] = useState<Step>("form");
   const [data, setData] = useState<BookingValues | null>(null);
+  const saveBooking = useServerFn(createBooking);
+  const savedRef = useRef(false);
 
   const form = useForm<BookingValues>({
     resolver: zodResolver(bookingSchema),
@@ -407,6 +411,24 @@ function BookingPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => {
+                    if (!savedRef.current) {
+                      savedRef.current = true;
+                      void saveBooking({
+                        data: {
+                          name: data.name,
+                          phone: data.phone,
+                          service: data.service,
+                          units: data.units,
+                          acType: data.acType,
+                          ...(data.complaint ? { complaint: data.complaint } : {}),
+                          address: data.address,
+                          date: format(data.date, "yyyy-MM-dd"),
+                          ...(data.time ? { time: data.time } : {}),
+                        },
+                      }).catch(() => {
+                        savedRef.current = false;
+                      });
+                    }
                     setStep("success");
                     window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
