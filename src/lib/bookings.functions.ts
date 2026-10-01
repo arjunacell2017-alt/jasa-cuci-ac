@@ -40,6 +40,14 @@ export type BookingDTO = {
   status: BookingStatus;
   technicianId: string | null;
   technicianName: string | null;
+  /** Hanya diisi oleh getBooking (detail). */
+  technician: {
+    namaTeknisi: string;
+    nomorWhatsapp: string;
+    status: "aktif" | "sibuk" | "tidak_aktif";
+    kabupaten: string;
+    kecamatan: string;
+  } | null;
   assignedAt: string | null;
   technicianNotes: string;
   createdAt: string;
@@ -125,7 +133,13 @@ type Row = {
   assigned_at: string | null;
   technician_notes: string;
   created_at: string;
-  technicians: { nama_teknisi: string } | null;
+  technicians: {
+    nama_teknisi: string;
+    nomor_whatsapp?: string;
+    status?: "aktif" | "sibuk" | "tidak_aktif";
+    kabupaten?: string;
+    kecamatan?: string;
+  } | null;
 };
 
 function map(r: Row): BookingDTO {
@@ -144,22 +158,44 @@ function map(r: Row): BookingDTO {
     status: r.status,
     technicianId: r.technician_id,
     technicianName: r.technicians?.nama_teknisi ?? null,
+    technician: r.technicians?.nomor_whatsapp !== undefined
+      ? {
+          namaTeknisi: r.technicians.nama_teknisi,
+          nomorWhatsapp: r.technicians.nomor_whatsapp ?? "",
+          status: r.technicians.status ?? "aktif",
+          kabupaten: r.technicians.kabupaten ?? "",
+          kecamatan: r.technicians.kecamatan ?? "",
+        }
+      : null,
     assignedAt: r.assigned_at,
     technicianNotes: r.technician_notes,
     createdAt: r.created_at,
   };
 }
 
+export const BOOKING_PAGE_SIZE = 20;
+
 export const listBookings = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<BookingDTO[]> => {
-    const { data, error } = await context.supabase
+  .inputValidator((d: unknown) =>
+    z
+      .object({ page: z.number().int().min(0).default(0), status: z.enum(bookingStatuses).optional() })
+      .parse(d ?? {}),
+  )
+  .handler(async ({ data, context }): Promise<{ items: BookingDTO[]; total: number }> => {
+    const from = data.page * BOOKING_PAGE_SIZE;
+    let q = context.supabase
       .from("bookings")
-      .select("*, technicians(nama_teknisi)")
+      .select(
+        "id, nama, whatsapp, service_type_id, service_label, unit_count, ac_type, keluhan, alamat, tanggal, waktu, status, technician_id, assigned_at, technician_notes, created_at, technicians(nama_teknisi)",
+        { count: "exact" },
+      )
       .order("created_at", { ascending: false })
-      .limit(500);
+      .range(from, from + BOOKING_PAGE_SIZE - 1);
+    if (data.status) q = q.eq("status", data.status);
+    const { data: rows, error, count } = await q;
     if (error) throw new Error(error.message);
-    return (data as unknown as Row[]).map(map);
+    return { items: (rows as unknown as Row[]).map(map), total: count ?? 0 };
   });
 
 export const getBooking = createServerFn({ method: "GET" })
@@ -168,7 +204,7 @@ export const getBooking = createServerFn({ method: "GET" })
   .handler(async ({ data, context }): Promise<BookingDTO | null> => {
     const { data: row, error } = await context.supabase
       .from("bookings")
-      .select("*, technicians(nama_teknisi)")
+      .select("*, technicians(nama_teknisi, nomor_whatsapp, status, kabupaten, kecamatan)")
       .eq("id", data.id)
       .maybeSingle();
     if (error) throw new Error(error.message);
@@ -202,5 +238,23 @@ export const updateBooking = createServerFn({ method: "POST" })
     }
     const { error } = await context.supabase.from("bookings").update(patch).eq("id", data.id);
     if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const deleteBooking = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin) throw new Error("Forbidden");
+    const { error, count } = await context.supabase
+      .from("bookings")
+      .delete({ count: "exact" })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    if (!count) throw new Error("Booking tidak ditemukan");
     return { ok: true };
   });
