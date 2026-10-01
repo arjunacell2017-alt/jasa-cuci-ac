@@ -199,16 +199,24 @@ export function TechnicianFormSheet({
 
   async function upload(file: File) {
     if (!draft) return;
-    if (!file.type.startsWith("image/")) return toast.error("File harus berupa gambar.");
+    if (!file.type.startsWith("image/")) {
+      toast.error("File harus berupa gambar.");
+      return;
+    }
     setUploading(true);
     const path = `${crypto.randomUUID()}.${file.name.split(".").pop() ?? "jpg"}`;
     const { error } = await supabase.storage.from("technician-photos").upload(path, file);
     setUploading(false);
-    if (error) return toast.error("Gagal mengunggah foto.");
+    if (error) {
+      toast.error("Gagal mengunggah foto.");
+      return;
+    }
     setDraft({ ...draft, foto_path: path });
   }
 
-  const set = <K extends keyof TechDraft>(k: K, v: TechDraft[K]) => draft && setDraft({ ...draft, [k]: v });
+  const set = <K extends keyof TechDraft>(k: K, v: TechDraft[K]) => {
+    if (draft) setDraft({ ...draft, [k]: v });
+  };
   const err = (k: string) =>
     errors[k] ? <p className="text-xs font-medium text-destructive">{errors[k]}</p> : null;
 
