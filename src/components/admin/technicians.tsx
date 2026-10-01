@@ -97,11 +97,29 @@ export function WhatsAppTechButton({
   message?: string;
   size?: "sm" | "default";
 }) {
+  const valid = !!phone && isValidIndoPhone(phone);
+  const url = valid ? waTo(phone, message ?? technicianGreeting(name)) : undefined;
   return (
     <a
-      href={waTo(phone, message ?? technicianGreeting(name))}
+      href={url ?? "#"}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={(e) => {
+        e.preventDefault();
+        if (!url) {
+          toast.error("Nomor WhatsApp teknisi belum tersedia atau tidak valid.");
+          return;
+        }
+        const w = window.open(url, "_blank", "noopener,noreferrer");
+        // Fallback jika popup diblokir: arahkan tab teratas langsung ke wa.me
+        if (!w) {
+          try {
+            (window.top ?? window).location.href = url;
+          } catch {
+            window.location.href = url;
+          }
+        }
+      }}
       className={cn(
         "inline-flex items-center justify-center gap-1.5 rounded-lg bg-whatsapp font-semibold text-whatsapp-foreground hover:brightness-95",
         size === "sm" ? "h-8 px-3 text-xs" : "h-10 px-4 text-sm",

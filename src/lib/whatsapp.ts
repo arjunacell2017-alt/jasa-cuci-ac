@@ -1,6 +1,7 @@
 /** Normalisasi nomor Indonesia (08xx, +628xx, 628xx) menjadi format 628xx. */
 export function normalizeIndoPhone(raw: string): string {
   let d = raw.replace(/[^0-9]/g, "");
+  if (d.startsWith("62")) return d;
   if (d.startsWith("0")) d = "62" + d.slice(1);
   else if (d.startsWith("8")) d = "62" + d;
   return d;
@@ -9,9 +10,10 @@ export function normalizeIndoPhone(raw: string): string {
 export const indoPhoneRegex = /^(?:\+62|62|0)8[1-9][0-9]{6,11}$/;
 
 export function isValidIndoPhone(raw: string) {
-  return indoPhoneRegex.test(raw.replace(/[\s-]/g, ""));
+  return indoPhoneRegex.test(raw.replace(/[\s\-()]/g, ""));
 }
 
+/** Link resmi wa.me (bukan api.whatsapp.com). */
 export function waTo(phone: string, message: string) {
   return `https://wa.me/${normalizeIndoPhone(phone)}?text=${encodeURIComponent(message)}`;
 }
@@ -22,25 +24,34 @@ export function technicianGreeting(name: string) {
 
 export function buildTechnicianOrderMessage(input: {
   technicianName: string;
+  customerName: string;
+  customerPhone: string;
   service: string;
   units: number;
-  location: string;
+  acType: string;
   date?: string | null | undefined;
   time?: string | null | undefined;
+  address: string;
 }) {
   return [
-    technicianGreeting(input.technicianName),
+    `Halo Pak ${input.technicianName},`,
     "",
-    "Ada order AC yang ingin kami koordinasikan:",
+    "Saya dari ARJUNA COOL.ID.",
     "",
+    "Ada booking service AC yang perlu dikonfirmasi:",
+    "",
+    `Nama pelanggan: ${input.customerName}`,
+    `WhatsApp pelanggan: +${normalizeIndoPhone(input.customerPhone)}`,
     `Layanan: ${input.service}`,
-    `Jumlah unit: ${input.units}`,
-    `Lokasi: ${input.location}`,
+    `Jumlah unit: ${input.units} unit`,
+    `Jenis AC: ${input.acType}`,
     `Tanggal: ${input.date || "-"}`,
-    `Jam: ${input.time || "Menyesuaikan"}`,
+    `Waktu: ${input.time || "Menyesuaikan"}`,
+    `Alamat: ${input.address}`,
     "",
-    "Apakah Bapak tersedia untuk mengambil pekerjaan ini?",
+    "Mohon konfirmasi apakah Bapak dapat mengambil booking ini.",
     "",
     "Terima kasih.",
+    "ARJUNA COOL.ID",
   ].join("\n");
 }

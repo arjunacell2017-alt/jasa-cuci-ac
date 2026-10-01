@@ -100,11 +100,14 @@ function BookingDetail() {
     if (!b) return "";
     return buildTechnicianOrderMessage({
       technicianName: t.namaTeknisi,
+      customerName: b.nama,
+      customerPhone: b.whatsapp,
       service: b.serviceLabel,
       units: b.unitCount,
-      location: b.alamat,
-      date: fmtDate(b.tanggal, false),
+      acType: b.acType,
+      date: fmtDate(b.tanggal),
       time: b.waktu,
+      address: b.alamat,
     });
   }
 
