@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, UserPlus } from "lucide-react";
@@ -19,6 +19,7 @@ import {
 } from "@/lib/technicians.functions";
 import { buildTechnicianOrderMessage, waTo } from "@/lib/whatsapp";
 import { AdminShell } from "@/components/admin/AdminShell";
+import { DeleteBookingButton } from "@/components/admin/DeleteBookingButton";
 import {
   StatusBadge,
   WhatsAppTechButton,
@@ -75,12 +76,13 @@ function BookingDetail() {
   const typesFn = useServerFn(listServiceTypes);
 
   const booking = useQuery({ queryKey: ["bookings", id], queryFn: () => getFn({ data: { id } }) });
-  const techs = useQuery({ queryKey: ["technicians"], queryFn: () => techFn() });
-  const types = useQuery({ queryKey: ["service-types"], queryFn: () => typesFn() });
-  const typeList = types.data ?? [];
-
   const [notes, setNotes] = useState("");
   const [pickerOpen, setPickerOpen] = useState(false);
+  // Data teknisi & keahlian hanya diambil saat dialog pilih teknisi dibuka.
+  const techs = useQuery({ queryKey: ["technicians"], queryFn: () => techFn(), enabled: pickerOpen });
+  const types = useQuery({ queryKey: ["service-types"], queryFn: () => typesFn(), enabled: pickerOpen, staleTime: 10 * 60_000 });
+  const typeList = types.data ?? [];
+  const navigate = useNavigate();
   useEffect(() => setNotes(booking.data?.technicianNotes ?? ""), [booking.data?.technicianNotes]);
 
   const update = useMutation({
@@ -94,9 +96,9 @@ function BookingDetail() {
   });
 
   const b = booking.data;
-  const assigned = techs.data?.find((t) => t.id === b?.technicianId) ?? null;
+  const assigned = b?.technician ?? null;
 
-  function orderMessage(t: TechnicianDTO) {
+  function orderMessage(t: { namaTeknisi: string }) {
     if (!b) return "";
     return buildTechnicianOrderMessage({
       technicianName: t.namaTeknisi,
@@ -124,9 +126,12 @@ function BookingDetail() {
 
   return (
     <AdminShell title={`Booking ${b.nama}`} description={`Masuk ${new Date(b.createdAt).toLocaleString("id-ID")}`}>
-      <Link to="/admin/booking" className="mb-4 inline-flex items-center gap-1 text-sm font-semibold text-brand hover:underline">
+      <div className="mb-4 flex items-center justify-between gap-2">
+      <Link to="/admin/booking" className="inline-flex items-center gap-1 text-sm font-semibold text-brand hover:underline">
         <ArrowLeft className="size-4" aria-hidden /> Semua booking
       </Link>
+      <DeleteBookingButton id={b.id} onDeleted={() => void navigate({ to: "/admin/booking" })} />
+      </div>
 
       <div className="grid gap-4 lg:grid-cols-[1fr_22rem]">
         <section className="rounded-2xl border border-border bg-card p-5 shadow-soft">
@@ -170,7 +175,7 @@ function BookingDetail() {
                 <p className="font-semibold text-foreground">{assigned.namaTeknisi}</p>
                 <StatusBadge status={assigned.status} />
               </div>
-              <p className="text-sm text-muted-foreground">{areaText(assigned)} · {assigned.nomorWhatsapp}</p>
+              <p className="text-sm text-muted-foreground">{[assigned.kecamatan, assigned.kabupaten].filter(Boolean).join(", ")} · {assigned.nomorWhatsapp}</p>
               {b.assignedAt ? (
                 <p className="text-xs text-muted-foreground">Ditugaskan {new Date(b.assignedAt).toLocaleString("id-ID")}</p>
               ) : null}
@@ -202,6 +207,7 @@ function BookingDetail() {
         open={pickerOpen}
         onOpenChange={setPickerOpen}
         techs={techs.data ?? []}
+        loading={techs.isPending}
         types={typeList}
         serviceTypeId={b.serviceTypeId}
         location={b.alamat}
@@ -227,7 +233,9 @@ function TechnicianPicker({
   location,
   orderMessage,
   onPick,
+  loading,
 }: {
+  loading: boolean;
   open: boolean;
   onOpenChange: (o: boolean) => void;
   techs: TechnicianDTO[];
@@ -293,7 +301,8 @@ function TechnicianPicker({
           </Select>
         </div>
         <div className="mt-2 grid gap-2">
-          {list.length === 0 ? <p className="py-6 text-center text-sm text-muted-foreground">Tidak ada teknisi yang cocok.</p> : null}
+          {loading ? <p className="py-6 text-center text-sm text-muted-foreground">Memuat teknisi...</p> : null}
+          {!loading && list.length === 0 ? <p className="py-6 text-center text-sm text-muted-foreground">Tidak ada teknisi yang cocok.</p> : null}
           {list.map(({ t }) => (
             <div key={t.id} className="rounded-xl border border-border p-3">
               <div className="flex flex-wrap items-center justify-between gap-2">

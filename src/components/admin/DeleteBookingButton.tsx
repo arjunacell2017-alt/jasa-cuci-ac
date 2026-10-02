@@ -31,7 +31,7 @@ export function DeleteBookingButton({
     mutationFn: () => delFn({ data: { id } }),
     onSuccess: () => {
       toast.success("Booking dihapus.");
-      qc.removeQueries({ queryKey: ["booking", id] });
+      qc.removeQueries({ queryKey: ["bookings", id] });
       void qc.invalidateQueries({ queryKey: ["bookings"] });
       onDeleted?.();
     },
