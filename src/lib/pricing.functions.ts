@@ -329,3 +329,21 @@ export const deletePackage = createServerFn({ method: "POST" })
     if (res.error) throw res.error;
     return { ok: true };
   });
+
+export type PublicServiceType = { id: string; name: string; slug: string };
+
+/** Publik: jenis layanan aktif untuk formulir booking (dari database). */
+export const getPublicServiceTypes = createServerFn({ method: "GET" }).handler(
+  async (): Promise<PublicServiceType[]> => {
+    const { data, error } = await publicClient()
+      .from("service_types")
+      .select("id, name, slug")
+      .eq("is_active", true)
+      .order("display_order", { ascending: true });
+    if (error) {
+      console.error("getPublicServiceTypes", error);
+      throw new Error("Gagal memuat layanan");
+    }
+    return data ?? [];
+  },
+);

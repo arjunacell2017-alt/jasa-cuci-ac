@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { acTypeOptions, serviceOptions, timeSlots } from "@/data/bookingOptions";
+import { acTypeOptions, timeSlots } from "@/data/bookingOptions";
 
 const phoneRegex = /^(?:\+62|62|0)8[1-9][0-9]{6,11}$/;
 
@@ -17,9 +17,10 @@ export const bookingSchema = z.object({
     .refine((v) => phoneRegex.test(v.replace(/[\s-]/g, "")), {
       message: "Nomor WhatsApp belum valid. Contoh: 081234567890",
     }),
-  service: z.enum(serviceOptions, {
-    errorMap: () => ({ message: "Silakan pilih layanan yang ingin dipesan." }),
-  }),
+  /** id dari tabel jenis layanan (service_types). */
+  service: z
+    .string({ required_error: "Silakan pilih layanan yang ingin dipesan." })
+    .uuid({ message: "Silakan pilih layanan yang ingin dipesan." }),
   units: z
     .number({ invalid_type_error: "Jumlah unit minimal 1." })
     .int({ message: "Jumlah unit harus berupa angka bulat." })
