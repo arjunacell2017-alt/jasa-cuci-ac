@@ -112,7 +112,7 @@ function BookingPage() {
     defaultValues: {
       name: "",
       phone: "",
-      service: undefined,
+      service: "",
       units: 1,
       acType: "Split Wall",
       complaint: "",
