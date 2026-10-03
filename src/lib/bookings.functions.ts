@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { acTypeOptions, serviceOptions, timeSlots } from "@/data/bookingOptions";
+import { acTypeOptions, timeSlots } from "@/data/bookingOptions";
 import { indoPhoneRegex } from "@/lib/whatsapp";
 
 export const bookingStatuses = [
@@ -76,7 +76,7 @@ export const createBooking = createServerFn({ method: "POST" })
           .trim()
           .max(20)
           .refine((v) => indoPhoneRegex.test(v.replace(/[\s-]/g, ""))),
-        service: z.enum(serviceOptions),
+        serviceTypeId: z.string().uuid(),
         units: z.number().int().min(1).max(100),
         acType: z.enum(acTypeOptions),
         complaint: z.string().trim().max(1000).optional(),
@@ -90,16 +90,18 @@ export const createBooking = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: st } = await supabaseAdmin
       .from("service_types")
-      .select("id")
-      .eq("slug", SLUG_BY_OPTION[data.service] ?? "")
+      .select("id, name")
+      .eq("id", data.serviceTypeId)
+      .eq("is_active", true)
       .maybeSingle();
+    if (!st) throw new Error("Layanan tidak valid");
     const { data: row, error } = await supabaseAdmin
       .from("bookings")
       .insert({
         nama: data.name,
         whatsapp: data.phone,
-        service_type_id: st?.id ?? null,
-        service_label: data.service,
+        service_type_id: st.id,
+        service_label: st.name,
         unit_count: data.units,
         ac_type: data.acType,
         keluhan: data.complaint ?? "",

@@ -30,7 +30,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 import { PageHero } from "@/components/PageHero";
 import { buildBookingMessage, site, waLink } from "@/config/site";
-import { acTypeOptions, optionFromSlug, serviceOptions, timeSlots } from "@/data/bookingOptions";
+import { acTypeOptions, serviceSlugToOption, timeSlots } from "@/data/bookingOptions";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { getPublicServiceTypes } from "@/lib/pricing.functions";
 import { bookingSchema, type BookingValues } from "@/lib/bookingSchema";
 
 export const Route = createFileRoute("/booking")({
@@ -95,13 +98,21 @@ function BookingPage() {
   const [data, setData] = useState<BookingValues | null>(null);
   const saveBooking = useServerFn(createBooking);
   const savedRef = useRef(false);
+  const fetchTypes = useServerFn(getPublicServiceTypes);
+  const types = useQuery({
+    queryKey: ["public-service-types"],
+    queryFn: () => fetchTypes(),
+    staleTime: 10 * 60_000,
+  });
+  const typeList = types.data ?? [];
+  const serviceName = (id?: string) => typeList.find((t) => t.id === id)?.name ?? "";
 
   const form = useForm<BookingValues>({
     resolver: zodResolver(bookingSchema),
     defaultValues: {
       name: "",
       phone: "",
-      service: optionFromSlug(service),
+      service: "",
       units: 1,
       acType: "Split Wall",
       complaint: "",
@@ -110,6 +121,14 @@ function BookingPage() {
     } as Partial<BookingValues> as BookingValues,
     mode: "onSubmit",
   });
+
+  // Pilih layanan otomatis dari tautan (?service=slug) setelah daftar layanan dimuat.
+  useEffect(() => {
+    if (!service || !types.data || form.getValues("service")) return;
+    const name = serviceSlugToOption[service];
+    const match = types.data.find((t) => t.slug === service || t.name === name);
+    if (match) form.setValue("service", match.id);
+  }, [service, types.data, form]);
 
   const {
     register,
@@ -128,7 +147,7 @@ function BookingPage() {
     ? buildBookingMessage({
         name: data.name,
         phone: data.phone,
-        service: data.service,
+        service: serviceName(data.service),
         units: data.units,
         acType: data.acType,
         date: format(data.date, "d MMMM yyyy", { locale: idLocale }),
@@ -208,20 +227,40 @@ function BookingPage() {
                   control={control}
                   name="service"
                   render={({ field }) => (
-                    <Select value={field.value} onValueChange={field.onChange}>
+                    <Select
+                      {...(field.value ? { value: field.value } : {})}
+                      onValueChange={field.onChange}
+                      disabled={types.isPending || types.isError}
+                    >
                       <SelectTrigger className="!h-12 w-full text-base">
-                        <SelectValue placeholder="Pilih layanan" />
+                        <SelectValue
+                          placeholder={
+                            types.isPending
+                              ? "Memuat layanan..."
+                              : types.isError
+                                ? "Gagal memuat layanan"
+                                : "Pilih layanan"
+                          }
+                        />
                       </SelectTrigger>
                       <SelectContent>
-                        {serviceOptions.map((s) => (
-                          <SelectItem key={s} value={s}>
-                            {s}
+                        {typeList.map((t) => (
+                          <SelectItem key={t.id} value={t.id}>
+                            {t.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   )}
                 />
+                {types.isError ? (
+                  <p className="mt-1.5 text-sm font-medium text-destructive">
+                    Gagal memuat layanan. Silakan coba lagi.{" "}
+                    <button type="button" className="underline" onClick={() => void types.refetch()}>
+                      Muat ulang
+                    </button>
+                  </p>
+                ) : null}
                 <ErrorText>{errors.service?.message}</ErrorText>
               </Field>
 
@@ -374,7 +413,7 @@ function BookingPage() {
                 {[
                   ["Nama", data.name],
                   ["No. WhatsApp", data.phone],
-                  ["Layanan", data.service],
+                  ["Layanan", serviceName(data.service)],
                   ["Jumlah", `${data.units} unit`],
                   ["Jenis AC", data.acType],
                   ["Tanggal", format(data.date, "d MMMM yyyy", { locale: idLocale })],
@@ -417,7 +456,7 @@ function BookingPage() {
                         data: {
                           name: data.name,
                           phone: data.phone,
-                          service: data.service,
+                          serviceTypeId: data.service,
                           units: data.units,
                           acType: data.acType,
                           ...(data.complaint ? { complaint: data.complaint } : {}),
