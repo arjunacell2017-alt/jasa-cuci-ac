@@ -55,3 +55,9 @@ export function buildTechnicianOrderMessage(input: {
     "ARJUNA COOL.ID",
   ].join("\n");
 }
+
+/** Buka WhatsApp di tab baru (bukan di dalam frame). Mengembalikan false bila popup diblokir. */
+export function openWhatsApp(url: string): boolean {
+  const w = window.open(url, "_blank", "noopener,noreferrer");
+  return !!w;
+}

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Clock, MapPin, MessageCircle, Phone } from "lucide-react";
-import { site, telLink } from "@/config/site";
+import { waLink, site, telLink } from "@/config/site";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { BookingButton } from "@/components/BookingButton";
 import { PageHero } from "@/components/PageHero";
@@ -38,7 +38,7 @@ function KontakPage() {
       <section className="container-page py-14 sm:py-16">
         <div className="grid gap-6 lg:grid-cols-3">
           <a
-            href={`https://wa.me/${site.whatsapp.international}`}
+            href={waLink()}
             target="_blank"
             rel="noopener noreferrer"
             className="rounded-2xl border border-border bg-card p-6 shadow-soft transition-shadow hover:shadow-lift"
