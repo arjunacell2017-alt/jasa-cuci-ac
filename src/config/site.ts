@@ -1,3 +1,4 @@
+import { normalizeIndoPhone, waTo } from "@/lib/whatsapp";
 export const site = {
   name: "ARJUNA COOL.ID",
   tagline: "Jasa Cuci, Service & Perbaikan AC",
@@ -24,9 +25,11 @@ export const site = {
   serviceAreas: ["Purbalingga", "Banyumas", "Cilacap", "Banjarnegara"],
 } as const;
 
+export const consultMessage = `Halo ${site.name},\n\nSaya ingin konsultasi mengenai AC.\n\nMohon informasinya.`;
+
+/** Satu-satunya pembuat link WhatsApp bisnis — selalu wa.me (bukan api.whatsapp.com). */
 export function waLink(message?: string) {
-  const text = message ?? `Halo ${site.name}, saya ingin bertanya tentang jasa AC.`;
-  return `https://wa.me/${site.whatsapp.international}?text=${encodeURIComponent(text)}`;
+  return waTo(site.whatsapp.raw, message ?? consultMessage);
 }
 
 export const bookingMessage = `Halo ${site.name}, saya mau booking jasa AC.%0ANama:%0AAlamat:%0ALayanan:%0AJumlah unit:%0AWaktu yang diinginkan:`
@@ -34,6 +37,7 @@ export const bookingMessage = `Halo ${site.name}, saya mau booking jasa AC.%0ANa
   .join("\n");
 
 export type BookingMessageData = {
+  bookingNumber?: string | undefined;
   name: string;
   phone: string;
   service: string;
@@ -46,25 +50,22 @@ export type BookingMessageData = {
 };
 
 export function buildBookingMessage(data: BookingMessageData) {
-  const lines = [
-    `Halo ${site.name}, saya ingin melakukan booking jasa AC.`,
-    "",
-    "DATA BOOKING",
-    "",
+  const lines = [`Halo ${site.name},`, "", "Saya ingin melakukan booking service AC.", ""];
+  if (data.bookingNumber) lines.push(`No. Booking: ${data.bookingNumber}`);
+  lines.push(
     `Nama: ${data.name}`,
-    `No. WhatsApp: ${data.phone}`,
+    `WhatsApp: ${normalizeIndoPhone(data.phone)}`,
     `Layanan: ${data.service}`,
-    `Jumlah Unit: ${data.units}`,
+    `Jumlah unit: ${data.units}`,
     `Jenis AC: ${data.acType}`,
     `Tanggal: ${data.date}`,
-  ];
-  if (data.time) lines.push(`Waktu: ${data.time}`);
-  lines.push("", "Alamat:", data.address);
-  if (data.complaint?.trim()) lines.push("", "Keluhan:", data.complaint.trim());
-  lines.push("", "Mohon informasi dan konfirmasi jadwalnya.", "", "Terima kasih.");
+    `Waktu: ${data.time || "Menyesuaikan"}`,
+    `Alamat: ${data.address}`,
+  );
+  if (data.complaint?.trim()) lines.push(`Keluhan: ${data.complaint.trim()}`);
+  lines.push("", "Mohon konfirmasi booking saya.", "", "Terima kasih.");
   return lines.join("\n");
 }
-
 
 export const telLink = `tel:+62${site.phone.raw.slice(1)}`;
 
