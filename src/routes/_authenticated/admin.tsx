@@ -12,10 +12,10 @@ export const Route = createFileRoute("/_authenticated/admin")({
 function AdminLayout() {
   const navigate = useNavigate();
   const check = useServerFn(checkIsAdmin);
-  const { data, isPending, isError } = useQuery({
+  const { data, isPending, isError, refetch, isFetching } = useQuery({
     queryKey: ["admin", "is-admin"],
     queryFn: () => check(),
-    retry: false,
+    retry: 1,
   });
 
   if (isPending) {
@@ -26,7 +26,27 @@ function AdminLayout() {
     );
   }
 
-  if (isError || !data?.isAdmin) {
+  // Gagal memeriksa izin (gangguan server/koneksi) ≠ bukan admin. Jangan beri akses.
+  if (isError) {
+    return (
+      <AdminShell title="Gagal memeriksa izin">
+        <p className="text-sm text-muted-foreground">
+          Server sedang bermasalah sehingga izin admin belum bisa diperiksa. Ini bukan berarti
+          akun Anda tidak punya akses. Silakan coba lagi.
+        </p>
+        <button
+          type="button"
+          disabled={isFetching}
+          onClick={() => void refetch()}
+          className="mt-4 text-sm font-semibold text-brand hover:underline"
+        >
+          {isFetching ? "Memeriksa..." : "Coba Lagi"}
+        </button>
+      </AdminShell>
+    );
+  }
+
+  if (!data?.isAdmin) {
     return (
       <AdminShell title="Akses ditolak">
         <p className="text-sm text-muted-foreground">

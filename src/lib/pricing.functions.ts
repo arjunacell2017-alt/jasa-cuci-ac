@@ -179,11 +179,15 @@ type SupabaseCtx = ReturnType<typeof publicClient>;
 export const checkIsAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data } = await (context.supabase as SupabaseCtx).rpc("has_role", {
+    const { data, error } = await (context.supabase as SupabaseCtx).rpc("has_role", {
       _user_id: context.userId,
       _role: "admin",
     });
-    return { isAdmin: Boolean(data) };
+    if (error) {
+      console.error("[checkIsAdmin] has_role gagal:", error.message);
+      throw new Error("Gagal memeriksa izin admin");
+    }
+    return { isAdmin: data === true };
   });
 
 /** Semua data harga termasuk yang nonaktif (khusus admin). */

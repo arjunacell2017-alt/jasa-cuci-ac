@@ -1,5 +1,19 @@
 import "./lib/error-capture";
 
+// Hosting di luar Lovable (mis. Netlify) sering tidak menyediakan SUPABASE_URL /
+// SUPABASE_PUBLISHABLE_KEY di runtime server. Isi dari nilai publik VITE_* yang
+// sudah ikut ter-build. Hanya kunci publik — tidak ada kunci rahasia.
+{
+  const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process
+    ?.env;
+  if (env) {
+    env["SUPABASE_URL"] ||= import.meta.env["VITE_SUPABASE_URL"] as string | undefined;
+    env["SUPABASE_PUBLISHABLE_KEY"] ||= import.meta.env["VITE_SUPABASE_PUBLISHABLE_KEY"] as
+      | string
+      | undefined;
+  }
+}
+
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 
