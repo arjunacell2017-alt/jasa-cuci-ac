@@ -43,8 +43,18 @@ export type PackageDTO = {
 export type PricingDTO = { services: ServiceDTO[]; packages: PackageDTO[] };
 
 function publicClient() {
-  const url = process.env["SUPABASE_URL"]!;
-  const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
+  // Hosting di luar Lovable (mis. Netlify) sering tidak menyediakan SUPABASE_URL saat runtime.
+  // Fallback ke nilai VITE_* publik yang sudah di-inline saat build (aman: hanya publishable key).
+  const url = process.env["SUPABASE_URL"] || import.meta.env["VITE_SUPABASE_URL"];
+  const key =
+    process.env["SUPABASE_PUBLISHABLE_KEY"] || import.meta.env["VITE_SUPABASE_PUBLISHABLE_KEY"];
+  if (!url || !key) {
+    console.error("[pricing] Konfigurasi database publik tidak lengkap", {
+      hasUrl: Boolean(url),
+      hasKey: Boolean(key),
+    });
+    throw new Error("Konfigurasi server belum lengkap");
+  }
   return createClient<Database>(url, key, {
     auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
     global: {
@@ -135,9 +145,18 @@ export const getPublicPricing = createServerFn({ method: "GET" }).handler(
         .eq("is_active", true)
         .order("display_order", { ascending: true }),
     ]);
-    if (servicesRes.error) throw servicesRes.error;
-    if (pricesRes.error) throw pricesRes.error;
-    if (packagesRes.error) throw packagesRes.error;
+    const failed = [
+      ["services", servicesRes.error],
+      ["prices", pricesRes.error],
+      ["maintenance_packages", packagesRes.error],
+    ].filter(([, e]) => e);
+    if (failed.length) {
+      for (const [table, e] of failed) {
+        const err = e as { code?: string; message?: string };
+        console.error(`[pricing] gagal membaca ${table}`, { code: err.code, message: err.message });
+      }
+      throw new Error("Gagal memuat daftar harga");
+    }
 
     return {
       services: (servicesRes.data ?? []).map((s) => mapService(s, pricesRes.data ?? [])),

@@ -1,5 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { waLink } from "@/config/site";
 import { Info } from "lucide-react";
 import { PriceTable, PackageCard } from "@/components/PriceCard";
 import { SectionHeading } from "@/components/SectionHeading";
@@ -30,18 +32,42 @@ export const Route = createFileRoute("/harga")({
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(pricingQueryOptions),
   component: HargaPage,
-  errorComponent: () => (
+  errorComponent: HargaError,
+});
+
+function HargaError({ reset }: { reset: () => void }) {
+  const router = useRouter();
+  const qc = useQueryClient();
+  return (
     <section className="container-page py-20 text-center">
       <h1 className="text-xl font-semibold text-foreground">Daftar harga gagal dimuat</h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        Silakan muat ulang halaman atau hubungi kami lewat WhatsApp.
+        Terjadi gangguan saat mengambil data harga. Silakan coba lagi, atau tanyakan harga lewat
+        WhatsApp.
       </p>
+      <div className="mt-6 flex flex-wrap justify-center gap-3">
+        <Button
+          onClick={async () => {
+            await qc.resetQueries({ queryKey: pricingQueryOptions.queryKey });
+            reset();
+            await router.invalidate();
+          }}
+        >
+          Coba Lagi
+        </Button>
+        <Button variant="outline" asChild>
+          <a href={waLink()} target="_blank" rel="noopener noreferrer">
+            Tanya via WhatsApp
+          </a>
+        </Button>
+      </div>
     </section>
-  ),
-});
+  );
+}
 
 function HargaPage() {
   const { data } = useSuspenseQuery(pricingQueryOptions);
+  const isEmpty = data.services.length === 0 && data.packages.length === 0;
 
   return (
     <>
