@@ -87,6 +87,12 @@ function HargaPage() {
           </p>
         </div>
 
+        {isEmpty ? (
+          <p className="mt-8 rounded-2xl border border-border p-6 text-center text-sm text-muted-foreground">
+            Daftar harga sedang diperbarui. Silakan hubungi kami lewat WhatsApp untuk informasi harga
+            terbaru.
+          </p>
+        ) : null}
         <div className="mt-8 grid gap-6 lg:grid-cols-2">
           {data.services.map((g) => (
             <PriceTable key={g.id} group={g} />
