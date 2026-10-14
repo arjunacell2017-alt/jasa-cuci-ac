@@ -1,7 +1,6 @@
 import { useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { createBooking } from "@/lib/bookings.functions";
-import { openWhatsApp } from "@/lib/whatsapp";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -102,7 +101,6 @@ function BookingPage() {
   const [bookingNumber, setBookingNumber] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(false);
-  const [popupBlocked, setPopupBlocked] = useState(false);
   const fetchTypes = useServerFn(getPublicServiceTypes);
   const types = useQuery({
     queryKey: ["public-service-types"],
@@ -455,65 +453,51 @@ function BookingPage() {
                   type="button"
                   disabled={saving}
                   onClick={async () => {
-                    // Buka tab kosong langsung saat klik agar tidak diblokir browser,
-                    // lalu arahkan ke wa.me setelah booking tersimpan.
-                    const win = window.open("", "_blank");
+                    // Simpan dulu. WhatsApp dibuka lewat tautan langsung di langkah berikutnya
+                    // (klik pengguna sendiri), jadi tidak bisa diblokir browser dan tidak ada tab kosong.
+                    if (saving) return;
+                    if (savedRef.current) {
+                      setStep("success");
+                      return;
+                    }
                     setSaving(true);
                     setSaveError(false);
-                    let number = bookingNumber;
-                    if (!savedRef.current) {
-                      try {
-                        const res = await saveBooking({
-                          data: {
-                            name: data.name,
-                            phone: data.phone,
-                            serviceTypeId: data.service,
-                            units: data.units,
-                            acType: data.acType,
-                            ...(data.complaint ? { complaint: data.complaint } : {}),
-                            address: data.address,
-                            date: format(data.date, "yyyy-MM-dd"),
-                            ...(data.time ? { time: data.time } : {}),
-                          },
-                        });
-                        savedRef.current = true;
-                        number = "ARJ-" + res.id.slice(0, 8).toUpperCase();
-                        setBookingNumber(number);
-                      } catch {
-                        setSaveError(true);
-                      }
+                    try {
+                      const res = await saveBooking({
+                        data: {
+                          name: data.name,
+                          phone: data.phone,
+                          serviceTypeId: data.service,
+                          units: data.units,
+                          acType: data.acType,
+                          ...(data.complaint ? { complaint: data.complaint } : {}),
+                          address: data.address,
+                          date: format(data.date, "yyyy-MM-dd"),
+                          ...(data.time ? { time: data.time } : {}),
+                        },
+                      });
+                      savedRef.current = true;
+                      setBookingNumber("ARJ-" + res.id.slice(0, 8).toUpperCase());
+                      setStep("success");
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    } catch {
+                      setSaveError(true);
+                    } finally {
+                      setSaving(false);
                     }
-                    setSaving(false);
-                    const url = waLink(
-                      buildBookingMessage({
-                        bookingNumber: number ?? undefined,
-                        name: data.name,
-                        phone: data.phone,
-                        service: serviceName(data.service),
-                        units: data.units,
-                        acType: data.acType,
-                        date: format(data.date, "d MMMM yyyy", { locale: idLocale }),
-                        time: data.time,
-                        address: data.address,
-                        complaint: data.complaint || undefined,
-                      }),
-                    );
-                    if (win) {
-                      win.opener = null;
-                      win.location.href = url;
-                      setPopupBlocked(false);
-                    } else {
-                      setPopupBlocked(!openWhatsApp(url));
-                    }
-                    setStep("success");
-                    window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
-                  className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-whatsapp text-base font-semibold text-whatsapp-foreground shadow-soft transition-colors hover:brightness-95"
+                  className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-whatsapp text-base font-semibold text-whatsapp-foreground shadow-soft transition-colors hover:brightness-95 disabled:opacity-70"
                 >
                   <MessageCircle className="size-5" aria-hidden />
-                  {saving ? "Menyimpan booking..." : "Lanjut ke WhatsApp"}
+                  {saving ? "Menyimpan booking..." : "Simpan & Lanjut ke WhatsApp"}
                 </button>
               </div>
+              {saveError ? (
+                <p className="mt-4 rounded-xl bg-destructive/10 p-3 text-sm font-medium text-destructive">
+                  Booking gagal disimpan. Periksa koneksi internet Anda lalu coba lagi, atau hubungi kami
+                  langsung lewat WhatsApp.
+                </p>
+              ) : null}
             </div>
           ) : null}
 
@@ -523,30 +507,16 @@ function BookingPage() {
                 <CheckCircle2 className="size-7" aria-hidden />
               </span>
               <h2 className="mt-5 text-xl font-bold text-foreground sm:text-2xl">
-                Booking Anda siap dikirim
+                Booking Anda berhasil disimpan
               </h2>
-              <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
-                Permintaan booking Anda sudah disiapkan. Silakan kirim pesan melalui WhatsApp untuk
-                mendapatkan konfirmasi jadwal dari tim kami.
-              </p>
               {bookingNumber ? (
-                <p className="mt-3 text-sm font-semibold text-foreground">No. Booking: {bookingNumber}</p>
+                <p className="mt-3 text-base font-semibold text-foreground">No. Booking: {bookingNumber}</p>
               ) : null}
-              {saveError ? (
-                <p className="mx-auto mt-3 max-w-md text-sm text-destructive">
-                  Booking belum tersimpan di sistem kami, tetapi Anda tetap bisa mengirimkannya lewat WhatsApp.
-                </p>
-              ) : null}
-              {popupBlocked ? (
-                <a
-                  href={waLink(message)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-3 inline-block text-sm font-semibold text-brand underline"
-                >
-                  Klik di sini untuk membuka WhatsApp
-                </a>
-              ) : null}
+              <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
+                Langkah terakhir: tekan tombol di bawah untuk mengirim detail booking ke WhatsApp kami
+                agar jadwal bisa dikonfirmasi. Jika WhatsApp belum terbuka, tekan tombolnya sekali lagi —
+                booking Anda tidak akan tercatat dua kali.
+              </p>
               <p className="mx-auto mt-3 flex max-w-md items-center justify-center gap-1.5 text-xs text-muted-foreground">
                 <Clock className="size-3.5" aria-hidden />
                 Jadwal baru terkonfirmasi setelah tim kami membalas pesan Anda.
@@ -560,7 +530,7 @@ function BookingPage() {
                   className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-whatsapp px-6 text-base font-semibold text-whatsapp-foreground shadow-soft transition-colors hover:brightness-95"
                 >
                   <MessageCircle className="size-5" aria-hidden />
-                  Kirim ulang ke WhatsApp
+                  Buka WhatsApp
                 </a>
                 <Link
                   to="/"
