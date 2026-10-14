@@ -480,7 +480,8 @@ function BookingPage() {
                       setBookingNumber("ARJ-" + res.id.slice(0, 8).toUpperCase());
                       setStep("success");
                       window.scrollTo({ top: 0, behavior: "smooth" });
-                    } catch {
+                    } catch (err) {
+                      console.error("[booking] simpan gagal:", err instanceof Error ? err.message : err);
                       setSaveError(true);
                     } finally {
                       setSaving(false);

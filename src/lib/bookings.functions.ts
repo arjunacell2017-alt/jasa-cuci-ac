@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { acTypeOptions, timeSlots } from "@/data/bookingOptions";
 import { indoPhoneRegex } from "@/lib/whatsapp";
+import type { Database } from "@/integrations/supabase/types";
 
 export const bookingStatuses = [
   "menunggu_teknisi",
@@ -87,35 +88,69 @@ export const createBooking = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: st } = await supabaseAdmin
+    // Pakai kunci publik (bukan service role) agar berjalan juga di hosting luar seperti Netlify.
+    // Keamanan dijaga oleh RLS: publik hanya boleh INSERT booking baru, tidak boleh membaca.
+    const url = process.env["SUPABASE_URL"] || import.meta.env["VITE_SUPABASE_URL"];
+    const key =
+      process.env["SUPABASE_PUBLISHABLE_KEY"] || import.meta.env["VITE_SUPABASE_PUBLISHABLE_KEY"];
+    if (!url || !key) {
+      console.error("[createBooking] stage=config", { hasUrl: Boolean(url), hasKey: Boolean(key) });
+      throw new Error("Konfigurasi server belum lengkap");
+    }
+    const { createClient } = await import("@supabase/supabase-js");
+    const db = createClient<Database>(url, key, {
+      auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+      global: {
+        fetch: (input, init) => {
+          const h = new Headers(init?.headers);
+          if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`)
+            h.delete("Authorization");
+          h.set("apikey", key);
+          return fetch(input, { ...init, headers: h });
+        },
+      },
+    });
+
+    const { data: st, error: stErr } = await db
       .from("service_types")
       .select("id, name")
       .eq("id", data.serviceTypeId)
       .eq("is_active", true)
       .maybeSingle();
-    if (!st) throw new Error("Layanan tidak valid");
-    const { data: row, error } = await supabaseAdmin
-      .from("bookings")
-      .insert({
-        nama: data.name,
-        whatsapp: data.phone,
-        service_type_id: st.id,
-        service_label: st.name,
-        unit_count: data.units,
-        ac_type: data.acType,
-        keluhan: data.complaint ?? "",
-        alamat: data.address,
-        tanggal: data.date,
-        waktu: data.time ?? "",
-      })
-      .select("id")
-      .single();
+    if (stErr) {
+      console.error("[createBooking] stage=service_lookup", { code: stErr.code, message: stErr.message });
+      throw new Error("Gagal memeriksa layanan");
+    }
+    if (!st) {
+      console.error("[createBooking] stage=service_lookup layanan tidak ditemukan/aktif");
+      throw new Error("Layanan tidak valid");
+    }
+
+    // ID dibuat di server sebelum insert: insert tanpa .select() (publik tidak boleh membaca booking).
+    const id = crypto.randomUUID();
+    const { error } = await db.from("bookings").insert({
+      id,
+      nama: data.name,
+      whatsapp: data.phone,
+      service_type_id: st.id,
+      service_label: st.name,
+      unit_count: data.units,
+      ac_type: data.acType,
+      keluhan: data.complaint ?? "",
+      alamat: data.address,
+      tanggal: data.date,
+      waktu: data.time ?? "",
+    });
     if (error) {
-      console.error("createBooking", error);
+      console.error("[createBooking] stage=insert", {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+      });
       throw new Error("Gagal menyimpan booking");
     }
-    return { id: row.id };
+    return { id };
   });
 
 type Row = {
