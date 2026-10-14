@@ -1,7 +1,6 @@
 import { useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { createBooking } from "@/lib/bookings.functions";
-import { openWhatsApp } from "@/lib/whatsapp";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -102,7 +101,6 @@ function BookingPage() {
   const [bookingNumber, setBookingNumber] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(false);
-  const [popupBlocked, setPopupBlocked] = useState(false);
   const fetchTypes = useServerFn(getPublicServiceTypes);
   const types = useQuery({
     queryKey: ["public-service-types"],
