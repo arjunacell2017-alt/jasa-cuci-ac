@@ -500,8 +500,6 @@ function BookingPage() {
                   langsung lewat WhatsApp.
                 </p>
               ) : null}
-              <div className="hidden">
-              </div>
             </div>
           ) : null}
 
@@ -511,30 +509,16 @@ function BookingPage() {
                 <CheckCircle2 className="size-7" aria-hidden />
               </span>
               <h2 className="mt-5 text-xl font-bold text-foreground sm:text-2xl">
-                Booking Anda siap dikirim
+                Booking Anda berhasil disimpan
               </h2>
-              <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
-                Permintaan booking Anda sudah disiapkan. Silakan kirim pesan melalui WhatsApp untuk
-                mendapatkan konfirmasi jadwal dari tim kami.
-              </p>
               {bookingNumber ? (
-                <p className="mt-3 text-sm font-semibold text-foreground">No. Booking: {bookingNumber}</p>
+                <p className="mt-3 text-base font-semibold text-foreground">No. Booking: {bookingNumber}</p>
               ) : null}
-              {saveError ? (
-                <p className="mx-auto mt-3 max-w-md text-sm text-destructive">
-                  Booking belum tersimpan di sistem kami, tetapi Anda tetap bisa mengirimkannya lewat WhatsApp.
-                </p>
-              ) : null}
-              {popupBlocked ? (
-                <a
-                  href={waLink(message)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-3 inline-block text-sm font-semibold text-brand underline"
-                >
-                  Klik di sini untuk membuka WhatsApp
-                </a>
-              ) : null}
+              <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
+                Langkah terakhir: tekan tombol di bawah untuk mengirim detail booking ke WhatsApp kami
+                agar jadwal bisa dikonfirmasi. Jika WhatsApp belum terbuka, tekan tombolnya sekali lagi —
+                booking Anda tidak akan tercatat dua kali.
+              </p>
               <p className="mx-auto mt-3 flex max-w-md items-center justify-center gap-1.5 text-xs text-muted-foreground">
                 <Clock className="size-3.5" aria-hidden />
                 Jadwal baru terkonfirmasi setelah tim kami membalas pesan Anda.
@@ -548,7 +532,7 @@ function BookingPage() {
                   className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-whatsapp px-6 text-base font-semibold text-whatsapp-foreground shadow-soft transition-colors hover:brightness-95"
                 >
                   <MessageCircle className="size-5" aria-hidden />
-                  Kirim ulang ke WhatsApp
+                  Buka WhatsApp
                 </a>
                 <Link
                   to="/"
