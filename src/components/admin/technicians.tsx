@@ -81,7 +81,7 @@ export function TechnicianPhoto({ path, className }: { path: string | null; clas
         className,
       )}
     >
-      {url ? <img src={url} alt="" className="size-full object-cover" /> : <User className="size-5" aria-hidden />}
+      {url ? <img src={url} alt="" loading="lazy" decoding="async" className="size-full object-cover" /> : <User className="size-5" aria-hidden />}
     </span>
   );
 }
