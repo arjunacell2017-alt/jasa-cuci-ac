@@ -18,7 +18,27 @@ export const Route = createFileRoute("/_authenticated/admin/")({
 
 function AdminHome() {
   const fetchPricing = useServerFn(getAdminPricing);
-  const { data } = useQuery({ queryKey: ["pricing", "admin"], queryFn: () => fetchPricing() });
+  const { data, isPending, isError } = useQuery({ queryKey: ["pricing", "admin"], queryFn: () => fetchPricing() });
+
+  if (isPending) {
+    return (
+      <AdminShell title="Ringkasan" description="Kelola harga layanan tanpa mengubah kode website.">
+        <div className="flex min-h-[30vh] items-center justify-center text-sm text-muted-foreground">
+          Memuat ringkasan...
+        </div>
+      </AdminShell>
+    );
+  }
+
+  if (isError) {
+    return (
+      <AdminShell title="Ringkasan" description="Kelola harga layanan tanpa mengubah kode website.">
+        <div className="rounded-2xl border border-border bg-card p-5 text-sm text-muted-foreground">
+          Gagal memuat ringkasan. Silakan muat ulang halaman.
+        </div>
+      </AdminShell>
+    );
+  }
 
   const allPrices = data?.services.flatMap((s) => s.items) ?? [];
   const stats = [
